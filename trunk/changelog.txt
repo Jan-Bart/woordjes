@@ -1,0 +1,46 @@
+v0.6.6 2010-09-25
+ - Bugfix: words will display random correctly
+
+v0.6.5 2010-09-08
+ - Add: Screen with results to make clear the game is over.
+ - Bugix: endGame doesn't show correct A -> B, B -> A
+
+v0.6.4 2010-08-26
+ - Add: .exe for windows users
+ - Add: tray icon and frame icon
+
+v0.6.3 2010-08-25
+ - Improved word handling
+ - BUG: with random words [Needs solving]
+ - Better "end game" handling
+ - Add: "save file"
+ - Bugfix:Found bug can't save the two last fields [Needs solving] [Solved]
+ - Add: check for updates
+ - Add: Check for OS
+
+v0.6.2 2010-08-13
+ - Created the inputfieldsPanel
+
+v0.6.1 2010-07-26
+ - Add: new class 'input' so it's possible to manually add more translations
+
+v0.6 2010-06-18
+ - Changed layout with MacWidgets.
+ - Bugfix: Correction shows up beneath the asked word in stead of next to it.
+
+v0.5 2010-05-20
+ - Added the special characters bar.
+ - Fixed the repaint bug while entering the Settingspage.
+
+V0.4 2010-04-02
+ - Added the option to randomize the words. 
+
+v0.3 2010-03-16
+ - Take "lijst.txt" as default, when the other files are deleted.
+ - When an answer is incorrect show the correct answer. (in red)
+
+v0.2 2010-02-24
+ - Possibility to change translation directon. ( A -> B , B -> A)
+ 
+v0.1 2010-02-10
+ - Everything
