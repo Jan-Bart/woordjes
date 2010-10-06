@@ -156,7 +156,7 @@ public class Gui extends JFrame {
         frame = new JFrame("Woordjes");
 
         // Set the frame icon to an image loaded from a file.
-        java.net.URL imgURL = Gui.class.getResource("icon_v04.gif");
+        java.net.URL imgURL = Gui.class.getResource("icon.gif");
         frame.setIconImage(new ImageIcon(imgURL).getImage());
 
         woordjes.getSettings();
