@@ -73,7 +73,7 @@ public class Gui extends JFrame {
     private JMenuItem miCheckUpdate;
     // Woordjes Layout
     private GridBagLayout gbl;
-    private JPanel pnlCenter, pnlCenterS, pnlWoord;
+    private JPanel pnlCenter, pnlCenterS, pnlWords,pnlWoord,pnlVertaling;
     private JLabel lblWoord, lblVertaling;
     private JTextField tfInput;
     private JButton btnCheck, btnTip, btnSettings, btnNewGame;
@@ -230,6 +230,8 @@ public class Gui extends JFrame {
         pnlCenterS = new JPanel();
         gbl = new GridBagLayout();
         pnlWoord = new JPanel();
+        pnlWords = new JPanel();
+        pnlVertaling = new JPanel();
         lblWoord = new JLabel();
         lblVertaling = new JLabel();
         tfInput = new JTextField();
@@ -306,43 +308,33 @@ public class Gui extends JFrame {
         mHelp.add(miCheckUpdate);
         // Center Panel
         pnlCenter.setLayout(new GridLayout(2, 1)); // rijen, kolommen
-        pnlCenter.add(pnlWoord);
+        pnlCenter.add(pnlWords);
         pnlCenter.add(pnlCenterS);
         pnlCenter.setBorder(new EmptyBorder(10, 10, 10, 10)); // B,L,O,R
         // Woord Panel
-        pnlWoord.setLayout(gbl);
-        pnlWoord.setBackground(Color.white);
+        pnlWords.setLayout(new GridLayout(2,1));
+        pnlWords.setBackground(Color.white);
         // Settings Panel
         pnlSettings.setBackground(Color.darkGray);
         pnlSettings.add(chkRandomWords);
         pnlSettings.add(chkChars);
-        // private GridBagLayout gblSettings;
 
-        // Place a component at cell location (1,1)
-        GridBagConstraints gbc1 = new GridBagConstraints();
-        gbc1.gridx = 1;
-        gbc1.gridy = 1;
-
-        GridBagConstraints gbc2 = new GridBagConstraints();
-        gbc2.gridx = 1;
-        gbc2.gridy = 2; // change to 3 will not affect distance to gbc1
-
-        // Associate the gridbag constraints with the component
-        gbl.setConstraints(lblWoord, gbc1);
-        gbl.setConstraints(lblVertaling, gbc2);
-
-        pnlWoord.setLayout(new GridLayout(2,1)); // r, c
-        
+        // Create panel to show Words
         pnlWoord.add(lblWoord);
-        pnlWoord.add(lblVertaling);
-        lblWoord.setBorder(BorderFactory.createLineBorder(Color.white));
+        pnlVertaling.add(lblVertaling);
+        pnlWords.setLayout(new GridLayout(2,1)); // r, c
+        pnlWoord.setBackground(Color.white);
+        pnlVertaling.setBackground(Color.white);
+        pnlWords.add(pnlWoord);
+        pnlWords.add(pnlVertaling);
         lblWoord.setFont(new Font("sansserif", Font.BOLD, 15));
         lblWoord.setHorizontalTextPosition(JLabel.CENTER);
-        //lblWoord.setVerticalTextPosition(JLabel.CENTER);
+        lblWoord.setVerticalTextPosition(JLabel.BOTTOM);
+        lblWoord.setBorder(BorderFactory.createEmptyBorder(pnlWoord.getHeight()/2,0,0,0)); //top,left
         lblVertaling.setFont(new Font("sansserif", Font.BOLD, 15));
         lblVertaling.setHorizontalTextPosition(JLabel.CENTER);
-        //lblVertaling.setVerticalTextPosition(JLabel.BOTTOM);
-
+   
+        // Create the inputfield and (if needed) special characters
         pnlCenterS.setLayout(new GridLayout(2, 1)); // rijen, kolommen
         pnlCenterS.add(tfInput);
         if (showChars) {
@@ -919,7 +911,6 @@ public class Gui extends JFrame {
                 lblWoord.setText(woordjes.getWoord());
                 tfInput.setText("");
             }
-            centerText(false);
         } else {
             // Word is wrong
             if (!isFout) {
@@ -928,7 +919,6 @@ public class Gui extends JFrame {
             isFout = true;
             lblVertaling.setForeground(Color.red);
             lblVertaling.setText("\n" + woordjes.getVertaling());
-            centerText(true);
             lblMelding.setText(" Oooh :( \t - \t Woord: " + currentWord + " / "
                     + woordjes.woorden.size() + "\t - \t Score: " + res + " / "
                     + woordjes.woorden.size());
@@ -951,38 +941,6 @@ public class Gui extends JFrame {
         }
 
     }
-
-    public void centerText(Boolean correction){
-        // Get width of Panel Word to center text
-        Dimension dimPnlWord = pnlWoord.getSize();
-        double widthPnlWord = dimPnlWord.getWidth();
-        int intWidthPnlWord = (int) widthPnlWord;
-
-        // Get the size of the current string
-         FontMetrics fmWord = lblWord.getFontMetrics(new Font("sansserif", Font.BOLD, 15));
-         int widthWord = fmWord.stringWidth(lblWord.getText());
-         int sizeWord =  (intWidthPnlWord - widthWord)/2;
-
-        if(!correction){
-            pnlWoord.setBorder(BorderFactory.createEmptyBorder(0,sizeWord,0,0)); //top,
-        }else{
-            // Get the size of the current correction
-            FontMetrics fmTranslation = lblVertaling.getFontMetrics(new Font("sansserif", Font.BOLD, 15));
-            int widthTranslation = fmTranslation.stringWidth(lblVertaling.getText());
-            int sizeTranslation =  (intWidthPnlWord - widthTranslation)/2;
-
-            // Prevent negative left margin
-            if(sizeTranslation <= 0){
-                sizeTranslation = 1;
-            }
-
-            pnlWoord.setBorder(BorderFactory.createEmptyBorder(0,sizeTranslation,0,0)); //top,
-            lblWord.setBorder(BorderFactory.createEmptyBorder(0,sizeWord,0,0)); //top,
-
-        }
-
-    }
-
 
     // Getters
     public SourceList getSourceList() {
