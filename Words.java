@@ -55,27 +55,41 @@ public class Words {
             // = most of the time. So don't use "/"
         }
 
+        getSettings();
+
 
         // Check if there's a wordlist available
-        wordlist = new File(wordlistPath);
-        if (wordlist.exists()) {
-            // Do nothing
-        } else {
-            try {
-                wordlist.createNewFile();
-            } catch (IOException e) {
-                msg = msg.concat("IO Exception: " + e + "\n");
-            }
-            // Write to temp file
-            BufferedWriter out;
-            try {
-                out = new BufferedWriter(new FileWriter(wordlist));
-                out.write("Nederlands ; Frans\nhond ; chien\nkat ; chat");
-                out.close();
-            } catch (IOException e) {
-                msg = msg.concat("IO Exception: " + e + "\n");
-            }
+
+        /* wordlist = new File(wordlistPath);
+        boolean exists = wordlist.exists();
+        if(exists){
+        System.out.println("'t bestaat");
+        }else{
+        System.out.println("Het bestaat niet");
         }
+        Boolean hasContent = false;*/
+        /*if (wordlist.exists()) {
+        // We found a path to a file,
+        //but does it still exists or does it contain words?
+        System.out.println("Path found");
+
+
+        try {
+        BufferedReader in = new BufferedReader(new InputStreamReader(
+        new FileInputStream(wordlist), "UTF-8"));
+        String s;
+        while ((s = in.readLine()) != null) {
+        s = s.trim();
+        }
+        in.close();
+        } catch (Exception e) {
+        System.out.println("Catch found");
+        createTmpWordList();
+        }
+        }else{
+        System.out.println("No path found");
+        createTmpWordList();
+        }*/
 
         setUiTranslations();
     }
@@ -84,9 +98,27 @@ public class Words {
         return os;
     }
 
+    private void createTmpWordList() {
+        System.out.println("No Path found or No Content Found");
+        try {
+            wordlist.createNewFile();
+        } catch (IOException e) {
+            msg = msg.concat("IO Exception: " + e + "\n");
+        }
+        // Write to temp file
+        BufferedWriter out;
+        try {
+            out = new BufferedWriter(new FileWriter(wordlist));
+            out.write("Nederlands ; Frans\nhond ; chien\nkat ; chat");
+            out.close();
+        } catch (IOException e) {
+            msg = msg.concat("IO Exception: " + e + "\n");
+        }
+    }
+
     /*
-     * TODO: Sadly there is no way to detect wich character set the inputFile is
-     * using so only unicode (UTF-8) is supported wich is the standard java
+     * TODO: Sadly there is no way to detect which characterset the inputFile is
+     * using so only unicode (UTF-8) is supported which is the standard java
      * charset. All lists created within this program (woordjes.wrd) should be
      * valid. Read more about it here:
      * http://userguide.icu-project.org/conversion/detection#TOC-CharsetDetector
@@ -209,7 +241,7 @@ public class Words {
         }
     }
 
-    public void getSettings() {
+    private void getSettings() {
 
         Settings = new File(settingsPath);
 
@@ -224,6 +256,7 @@ public class Words {
                 msg = msg.concat("IO Exception: " + e + "\n");
             }
         } else {
+            // read the existing settings file
             try {
                 BufferedReader in = new BufferedReader(new FileReader(Settings));
                 String str;
@@ -231,11 +264,21 @@ public class Words {
                     // zorg ervoor dat accenten ook worden afgedrukt
                     String UTF8str = new String(str.getBytes(), "UTF-8");
                     wordlist = new File(UTF8str);
+                    //boolean exists = wordlist.exists();
+                    if (wordlist.exists()) {
+                        // The path inside the settings does exists
+                    } else {
+                        // The path inside the settings file doesn't exists
+                        // So create a wordlist file
+                        createTmpWordList();
+                    }
                 }
                 in.close();
             } catch (IOException e) {
                 msg = msg.concat("IO Exception: " + e + "\n");
+
             }
+
         }
     }
 
