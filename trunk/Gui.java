@@ -164,6 +164,7 @@ public class Gui extends JFrame {
         initialiseerActionlisteners();
 
         woordjes.laadWoorden(woordjes.wordlist);
+        
         woordjes.randomize();
         lblWoord.setText(woordjes.getWoord());
         if (!woordjes.msg.isEmpty()) {

@@ -57,22 +57,12 @@ public class Words {
 
         getSettings();
 
-
         // Check if there's a wordlist available
-
-        /* wordlist = new File(wordlistPath);
-        boolean exists = wordlist.exists();
-        if(exists){
-        System.out.println("'t bestaat");
-        }else{
-        System.out.println("Het bestaat niet");
-        }
-        Boolean hasContent = false;*/
-        /*if (wordlist.exists()) {
+         wordlist = new File(wordlistPath);
+        Boolean hasContent = false;
+        if (wordlist.exists()) {
         // We found a path to a file,
         //but does it still exists or does it contain words?
-        System.out.println("Path found");
-
 
         try {
         BufferedReader in = new BufferedReader(new InputStreamReader(
@@ -83,13 +73,11 @@ public class Words {
         }
         in.close();
         } catch (Exception e) {
-        System.out.println("Catch found");
         createTmpWordList();
         }
         }else{
-        System.out.println("No path found");
         createTmpWordList();
-        }*/
+        }
 
         setUiTranslations();
     }
@@ -142,6 +130,14 @@ public class Words {
 
     public void laadWoorden(File wordlist) throws UnsupportedEncodingException {
 
+
+        if(wordlist.exists()){
+            System.out.println("Het bestaat");
+
+        }else{
+            System.out.println("Het bestaat niet");
+        }
+
         int regel = 0;
         try {
             // BufferedReader in = new BufferedReader(new FileReader(wordlist));
@@ -184,6 +180,7 @@ public class Words {
             }
             in.close();
         } catch (IOException e) {
+           
             msg = msg.concat("IOException: " + e + "\n");
         } catch (Exception e) {
             msg = msg.concat("Exception: " + e + "\n");
