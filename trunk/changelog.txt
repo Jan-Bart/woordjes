@@ -1,3 +1,9 @@
+V0.6.8 2010-10-12
+- Add settings check: If path to wordlist doesn't exists anymore, make a temp. one
+
+V0.6.7 2010-10-08
+- Improved centering text
+
 v0.6.6 2010-09-25
  - Bugfix: words will display random correctly
 
