@@ -159,7 +159,6 @@ public class Gui extends JFrame {
         java.net.URL imgURL = Gui.class.getResource("icon.gif");
         frame.setIconImage(new ImageIcon(imgURL).getImage());
 
-        woordjes.getSettings();
         initialiseerComponenten();
         layoutComponenten();
         initialiseerActionlisteners();
