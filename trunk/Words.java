@@ -22,16 +22,16 @@ public class Words {
     public ArrayList<String> uiTranslations = new ArrayList<String>();
     public String separator = ";";
     public int index;
-    public boolean AtoB = true; // vertaling a -> b of a <- b
-    public boolean randomWoordjes = false; // lijst afgaan of random woordjes
-    // uit de lijst
+    public boolean AtoB = true; // Translation a -> b or a <- b
+    // Follow list order or show words in random order?
+    public boolean randomWoordjes = false;
     public String msg = "";
     Random r = new Random();
     String os = System.getProperty("os.name");
     String settingsPath, lang1, lang2;
     String wordlistPath;
     String tmpFileName = "woordjes";
-    File wordlist;// = new File("lijst.txt"); // woordenlijst
+    File wordlist; // The list with the words
     File Settings;
 
     public Words() {
@@ -56,10 +56,8 @@ public class Words {
         }
 
         getSettings();
-
+        wordlist = new File(wordlistPath);
         // Check if there's a wordlist available
-         wordlist = new File(wordlistPath);
-        Boolean hasContent = false;
         if (wordlist.exists()) {
         // We found a path to a file,
         //but does it still exists or does it contain words?
@@ -129,14 +127,6 @@ public class Words {
     }
 
     public void laadWoorden(File wordlist) throws UnsupportedEncodingException {
-
-
-        if(wordlist.exists()){
-            System.out.println("Het bestaat");
-
-        }else{
-            System.out.println("Het bestaat niet");
-        }
 
         int regel = 0;
         try {
