@@ -47,7 +47,6 @@ import com.explodingpixels.macwidgets.SourceListCategory;
 import com.explodingpixels.macwidgets.SourceListItem;
 import com.explodingpixels.macwidgets.SourceListModel;
 import java.awt.AWTException;
-import java.awt.FontMetrics;
 import java.awt.Insets;
 import java.awt.Robot;
 import java.awt.SplashScreen;
@@ -72,7 +71,6 @@ public class Gui extends JFrame {
     private JMenu mHelp;
     private JMenuItem miCheckUpdate;
     // Woordjes Layout
-    private GridBagLayout gbl;
     private JPanel pnlCenter, pnlCenterS, pnlWords,pnlWoord,pnlVertaling;
     private JLabel lblWoord, lblVertaling;
     private JTextField tfInput;
@@ -83,8 +81,8 @@ public class Gui extends JFrame {
     private SourceListModel model;
     private SourceListCategory category;
     private SourceList sourceList;
-    private JLabel lbl, lblWord, lblSeparator0, lblTranslation;
-    private JTextField[] tmp; // declares an array of JTextFields
+    private JLabel lblWord, lblSeparator0, lblTranslation;
+    private JTextField[] tmp; // Declares an array of JTextFields
     private JLabel[] tmpL;
     private JButton btnSaveList;
     // EndGameFrame
@@ -110,7 +108,7 @@ public class Gui extends JFrame {
     private boolean endOfList = false;
     private boolean dontJumpLeft = true;
     private boolean pageIsSettings, pageIsInputFrame, pageIsEndGame, showChars;
-    private int nrOfImputFields = 12; // must be odd. always.
+    private int nrOfImputFields = 12; // Must be odd. always.
     Dimension withoutChar = new Dimension(550, 350); // width, length
     Dimension withChar = new Dimension(550, 460);
 
@@ -129,29 +127,6 @@ public class Gui extends JFrame {
 
         woordjes = new Words();
 
-        // Ask for window decorations provided by the look and feel.
-        // Changes the standard os borders...
-        //JFrame.setDefaultLookAndFeelDecorated(true);
-
-        /*try {
-        if (woordjes.os.equalsIgnoreCase("Windows")) {
-        // TODO: remove
-        // System.out.println("System: " + woordjes.os);
-        // Set cross-platform Java L&F (also called "Metal")
-        UIManager.setLookAndFeel(UIManager
-        .getCrossPlatformLookAndFeelClassName());
-        } else {
-        }
-        } catch (UnsupportedLookAndFeelException e) {
-        // handle exception
-        } catch (ClassNotFoundException e) {
-        // handle exception
-        } catch (InstantiationException e) {
-        // handle exception
-        } catch (IllegalAccessException e) {
-        // handle exception
-        }*/
-
         // Create the frame.
         frame = new JFrame("Woordjes");
 
@@ -164,7 +139,6 @@ public class Gui extends JFrame {
         initialiseerActionlisteners();
 
         woordjes.laadWoorden(woordjes.wordlist);
-        
         woordjes.randomize();
         lblWoord.setText(woordjes.getWoord());
         if (!woordjes.msg.isEmpty()) {
@@ -172,7 +146,7 @@ public class Gui extends JFrame {
         }
 
         frame.setSize(withoutChar);
-        // center frame on screen
+        // Center frame on screen
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         Dimension ssize = toolkit.getScreenSize();
         int x = (int) (ssize.getWidth() - getWidth()) / 2;
@@ -180,7 +154,7 @@ public class Gui extends JFrame {
         frame.setLocation(x, y);
         frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-        /* Splash*/
+        // Splash
         final SplashScreen splash = SplashScreen.getSplashScreen();
         if (splash == null) {
             System.out.println("SplashScreen.getSplashScreen() returned null");
@@ -200,12 +174,10 @@ public class Gui extends JFrame {
             }
         }
         splash.close();
+        /*splash */
         frame.setVisible(true);
         toFront();
-        /*splash */
-
         showStartscreen();
-
     }
 
     private void initialiseerComponenten() {
@@ -228,7 +200,6 @@ public class Gui extends JFrame {
         // Center
         pnlCenter = new JPanel();
         pnlCenterS = new JPanel();
-        gbl = new GridBagLayout();
         pnlWoord = new JPanel();
         pnlWords = new JPanel();
         pnlVertaling = new JPanel();
@@ -287,13 +258,11 @@ public class Gui extends JFrame {
         frame.add(pnlMenu, BorderLayout.NORTH);
         frame.add(bottomBar.getComponent(), BorderLayout.SOUTH);
         // MenuBar
-        // pnlMenu.setLayout(new BoxLayout(pnlMenu,BoxLayout.LINE_AXIS));
-        pnlMenu.setLayout(new GridLayout(1, 1)); // rijen, kolommen
-        mbMenu.setBorder(new EmptyBorder(0, 10, 0, 0)); // B,L,O,R
+        pnlMenu.setLayout(new GridLayout(1, 1)); // rows, columns
+        mbMenu.setBorder(new EmptyBorder(0, 10, 0, 0)); // t,l,b,r
         pnlMenu.setForeground(Color.white);
         mbMenu.setForeground(Color.black);
         pnlMenu.add(mbMenu);
-        // pnlMenu.add(Box.createHorizontalGlue());
         mbMenu.add(mFile);
         mFile.add(miNew);
         mFile.add(miOpen);
@@ -307,10 +276,10 @@ public class Gui extends JFrame {
         //mHelp.add(miTest);
         mHelp.add(miCheckUpdate);
         // Center Panel
-        pnlCenter.setLayout(new GridLayout(2, 1)); // rijen, kolommen
+        pnlCenter.setLayout(new GridLayout(2, 1)); // rows, columns
         pnlCenter.add(pnlWords);
         pnlCenter.add(pnlCenterS);
-        pnlCenter.setBorder(new EmptyBorder(10, 10, 10, 10)); // B,L,O,R
+        pnlCenter.setBorder(new EmptyBorder(10, 10, 10, 10)); // t,l,b,r
         // Woord Panel
         pnlWords.setLayout(new GridLayout(2,1));
         pnlWords.setBackground(Color.white);
@@ -318,7 +287,6 @@ public class Gui extends JFrame {
         pnlSettings.setBackground(Color.darkGray);
         pnlSettings.add(chkRandomWords);
         pnlSettings.add(chkChars);
-
         // Create panel to show Words
         pnlWoord.add(lblWoord);
         pnlVertaling.add(lblVertaling);
@@ -333,7 +301,6 @@ public class Gui extends JFrame {
         lblWoord.setBorder(BorderFactory.createEmptyBorder(pnlWoord.getHeight()/2,0,0,0)); //top,left
         lblVertaling.setFont(new Font("sansserif", Font.BOLD, 15));
         lblVertaling.setHorizontalTextPosition(JLabel.CENTER);
-   
         // Create the inputfield and (if needed) special characters
         pnlCenterS.setLayout(new GridLayout(2, 1)); // rijen, kolommen
         pnlCenterS.add(tfInput);
@@ -354,10 +321,8 @@ public class Gui extends JFrame {
             pnlCenterS.remove(pnlChars);
             getContentPane().validate();
         }
-        // pnlCenterS.add(btnCheck);
         tfInput.setBorder(BorderFactory.createLoweredBevelBorder());
         //UnifiedToolBar toolBar = new UnifiedToolBar();
-
         btnSettings.putClientProperty("JButton.buttonType", "textured");
         // toolBar.addComponentToLeft(button);
 
@@ -369,17 +334,13 @@ public class Gui extends JFrame {
         }
 
         // getContentPane().add(toolBar.getComponent(), BorderLayout.NORTH);
-
-
         frame.getContentPane().add(bottomBar.getComponent(),
                 BorderLayout.SOUTH);
-
     }
 
     private void initialiseerActionlisteners() {
         // Nieuw Spel
         miNew.addActionListener(new ActionListener() {
-
             public void actionPerformed(ActionEvent e) {
                 try {
                     nieuwSpel();
@@ -391,7 +352,6 @@ public class Gui extends JFrame {
         });
         // OpenFile
         miOpen.addActionListener(new ActionListener() {
-
             public void actionPerformed(ActionEvent e) {
                 try {
                     openFile();
@@ -654,9 +614,7 @@ public class Gui extends JFrame {
     }
 
     private void createInputFrame() {
-        if (!getPageIsSettings() && !getPageIsInputFrame()) {
-            frame.getContentPane().removeAll();
-        }
+        frame.getContentPane().removeAll();
         getSourceList().getComponent().setPreferredSize(new Dimension(150, 220)); // w,h
         frame.getContentPane().add(getBottomBar().getComponent(),
                 BorderLayout.PAGE_END);

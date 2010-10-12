@@ -1,5 +1,7 @@
 V0.6.8 2010-10-12
-- Add settings check: If path to wordlist doesn't exists anymore, make a temp. one
+- Add: settings check: If path to wordlist doesn't exists anymore, make a temp. one
+- Bugfix: Settings where still showing when clicked on "create list"
+- Cleaned the code a little bit
 
 V0.6.7 2010-10-08
 - Improved centering text
