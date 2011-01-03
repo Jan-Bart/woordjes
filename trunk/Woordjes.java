@@ -18,8 +18,8 @@ public class Woordjes {
          *
 	 */
 	private static final long serialVersionUID = 3362510925477346867L;
-	public static final String VERSION = "0.6.8";
-	public static final String DATE = "2010-10-12";
+	public static final String VERSION = "0.6.9";
+	public static final String DATE = "2011-01-02";
 
 	public Woordjes() {
 	}

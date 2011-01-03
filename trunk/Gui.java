@@ -1,13 +1,14 @@
 package woordjes;
 
+import com.explodingpixels.macwidgets.IAppWidgetFactory;
+import com.explodingpixels.macwidgets.HudWindow;
+import javax.swing.JTextArea;
 import java.awt.AlphaComposite;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -28,7 +29,6 @@ import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -41,18 +41,18 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import com.explodingpixels.macwidgets.BottomBar;
 import com.explodingpixels.macwidgets.BottomBarSize;
-import com.explodingpixels.macwidgets.HudWidgetFactory;
 import com.explodingpixels.macwidgets.SourceList;
 import com.explodingpixels.macwidgets.SourceListCategory;
 import com.explodingpixels.macwidgets.SourceListItem;
 import com.explodingpixels.macwidgets.SourceListModel;
 import java.awt.AWTException;
-import java.awt.Insets;
 import java.awt.Robot;
 import java.awt.SplashScreen;
 import java.awt.event.KeyEvent;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.KeyStroke;
+import static java.awt.event.InputEvent.CTRL_DOWN_MASK;
 
 public class Gui extends JFrame {
 
@@ -60,100 +60,70 @@ public class Gui extends JFrame {
     public JFrame frame;
     // Classes
     public Words woordjes;
+    public SettingsPanel settingsPanel;
+    public InputPanel inputPanel;
     // Menu
     private JPanel pnlMenu;
     private JMenuBar mbMenu;
     private JMenu mFile;
     private JMenuItem miNew, miOpen, miHighscores, miExit;
-    private JMenu mVertaling;
+    private JMenu mVertaling, mEdit;
     private JMenuItem miAtoB, miBtoA, miCreateList;
     private JMenuItem miTest;
     private JMenu mHelp;
-    private JMenuItem miCheckUpdate;
+    private JMenuItem miHelp, miCheckUpdate;
     // Woordjes Layout
-    private JPanel pnlCenter, pnlCenterS, pnlWords,pnlWoord,pnlVertaling;
+    private JPanel pnlCenter, pnlCenterS, pnlWords, pnlWoord, pnlVertaling;
     private JLabel lblWoord, lblVertaling;
     private JTextField tfInput;
     private JButton btnCheck, btnTip, btnSettings, btnNewGame;
     private JLabel lblMelding;
     // InputFrame (create new lists with words)
-    private JPanel pnlInputFrame;
     private SourceListModel model;
     private SourceListCategory category;
     private SourceList sourceList;
-    private JLabel lblWord, lblSeparator0, lblTranslation;
-    private JTextField[] tmp; // Declares an array of JTextFields
-    private JLabel[] tmpL;
-    private JButton btnSaveList;
     // EndGameFrame
     private JPanel pnlEndGame;
     private MyTableModel myModel;
     private JTable table;
     private JLabel lblTitleResult;
-    // Settings
-    private JPanel pnlSettings;
-    private JCheckBox chkRandomWords, chkChars;
+    //bottom
     private BottomBar bottomBar;
     // Special Characters
     private JPanel pnlChars;
     private JButton btnAaigu, btnAgrave, btnAcirconflexe, btnEaigu, btnEgrave,
             btnEcirconflexe;
     private JButton btnIcirconflexe, btnCcedille;
+    // Help
+    private JTextArea taAbout;
     // Variabels
     private JFileChooser chooser;
     public int currentWord = 1;
     public int fout, res;
+    private int fontSize;
+    private String fontName;
+    private int fontStyle;
     private String version, date;
     private boolean isFout;
     private boolean endOfList = false;
     private boolean dontJumpLeft = true;
     private boolean pageIsSettings, pageIsInputFrame, pageIsEndGame, showChars;
-    private int nrOfImputFields = 12; // Must be odd. always.
-    Dimension withoutChar = new Dimension(550, 350); // width, length
+    
+    Dimension withoutChar = new Dimension(560, 350); // width, length
     Dimension withChar = new Dimension(550, 460);
 
     static void renderSplashFrame(Graphics2D g, int frame) {
         final String[] comps = {"Woorden", "Instellingen", "Layout"};
+        //final String[] comps = {java.util.ResourceBundle.getBundle("woordjes/NL").getString("WORDS"), java.util.ResourceBundle.getBundle("woordjes/NL").getString("SETTINGS"), java.util.ResourceBundle.getBundle("woordjes/NL").getString("LAYOUT")};
         g.setComposite(AlphaComposite.Clear);
         g.fillRect(80, 140, 200, 40);//x,y,w,h
         g.setPaintMode();
         g.setColor(Color.BLACK);
+        //g.drawString(java.util.ResourceBundle.getBundle("woordjes/NL").getString("LOADING: ") + comps[(frame / 50) % 3] + "...", 80, 150);
         g.drawString("Laden: " + comps[(frame / 50) % 3] + "...", 80, 150);
     }
 
-    public Gui(String version, String date) throws UnsupportedEncodingException {
-        this.version = version;
-        this.date = date;
-
-        woordjes = new Words();
-
-        // Create the frame.
-        frame = new JFrame("Woordjes");
-
-        // Set the frame icon to an image loaded from a file.
-        java.net.URL imgURL = Gui.class.getResource("icon.gif");
-        frame.setIconImage(new ImageIcon(imgURL).getImage());
-
-        initialiseerComponenten();
-        layoutComponenten();
-        initialiseerActionlisteners();
-
-        woordjes.laadWoorden(woordjes.wordlist);
-        woordjes.randomize();
-        lblWoord.setText(woordjes.getWoord());
-        if (!woordjes.msg.isEmpty()) {
-            JOptionPane.showMessageDialog(Gui.this, woordjes.toString());
-        }
-
-        frame.setSize(withoutChar);
-        // Center frame on screen
-        Toolkit toolkit = Toolkit.getDefaultToolkit();
-        Dimension ssize = toolkit.getScreenSize();
-        int x = (int) (ssize.getWidth() - getWidth()) / 2;
-        int y = (int) (ssize.getHeight() - getHeight()) / 2;
-        frame.setLocation(x, y);
-        frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
-
+    public Gui(String version, String date) throws UnsupportedEncodingException {     
         // Splash
         final SplashScreen splash = SplashScreen.getSplashScreen();
         if (splash == null) {
@@ -174,29 +144,68 @@ public class Gui extends JFrame {
             }
         }
         splash.close();
-        /*splash */
+
+        this.version = version;
+        this.date = date;
+        // Create classes
+        woordjes = new Words();
+        settingsPanel = new SettingsPanel();
+        inputPanel = new InputPanel();
+
+        // Create the frame.
+        frame = new JFrame("Woordjes");
+        // Set the frame icon to an image loaded from a file.
+        java.net.URL imgURL = Gui.class.getResource("icon.gif");
+        frame.setIconImage(new ImageIcon(imgURL).getImage());
+        
+        woordjes.laadWoorden(woordjes.wordlist);
+        woordjes.randomize();
+        
+        initialiseerComponenten();
+        showStartscreen();
+        initialiseerActionlisteners();
+
+        lblWoord.setFont(new Font("sansserif", Font.BOLD, 15));
+        lblVertaling.setFont(new Font("sansserif", Font.BOLD, 15));
+        lblWoord.setText(woordjes.getWoord());
+        if (!woordjes.msg.isEmpty()) {
+            JOptionPane.showMessageDialog(Gui.this, woordjes.toString());
+        }
+        
+        frame.setSize(withoutChar);
+        // Center frame on screen
+        Toolkit toolkit = Toolkit.getDefaultToolkit();
+        Dimension ssize = toolkit.getScreenSize();
+        int x = (int) (ssize.getWidth() - getWidth()) / 2;
+        int y = (int) (ssize.getHeight() - getHeight()) / 2;
+        frame.setLocation(x, y);
+        frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
         frame.setVisible(true);
         toFront();
-        showStartscreen();
     }
 
     private void initialiseerComponenten() {
         // menu
         pnlMenu = new JPanel();
         mbMenu = new JMenuBar();
-        mFile = new JMenu("Bestand");
+        //mFile = new JMenu("<html><u>F</u>ile");
+        mFile = new JMenu("File");
         chooser = new JFileChooser();
-        miNew = new JMenuItem("Nieuw spel");
-        miOpen = new JMenuItem("Open Bestand");
+        miNew = new JMenuItem("Start again");
+        miOpen = new JMenuItem("Open file");
         miHighscores = new JMenuItem("Highscores");
-        miExit = new JMenuItem("Afsluiten");
-        mVertaling = new JMenu("Vertaling");
+        miExit = new JMenuItem("Exit");
+        mVertaling = new JMenu("Translation");
         miAtoB = new JMenuItem("A -> B");
         miBtoA = new JMenuItem("B -> A");
-        miCreateList = new JMenuItem("Lijst opstellen");
+        mEdit = new JMenu("Edit");
+        miCreateList = new JMenuItem("Compose list");
         mHelp = new JMenu("Help");
+        miHelp = new JMenuItem("Help contents");
         miTest = new JMenuItem("Test");
-        miCheckUpdate = new JMenuItem("Controleren op Update's");
+        miCheckUpdate = new JMenuItem("Check for updates");
+        //
+        taAbout = new JTextArea();
         // Center
         pnlCenter = new JPanel();
         pnlCenterS = new JPanel();
@@ -220,35 +229,21 @@ public class Gui extends JFrame {
         btnEcirconflexe = new JButton("\u00ea");
         btnIcirconflexe = new JButton("\u00ee");
         btnCcedille = new JButton("\u00e7");
-        pnlSettings = new JPanel();
-        chkRandomWords = HudWidgetFactory.createHudCheckBox("Woorden random weergeven");
-        chkChars = HudWidgetFactory.createHudCheckBox("Speciale karakters weergeven");
-        // InputFrame
-        pnlInputFrame = new JPanel();
-        tmp = new JTextField[nrOfImputFields]; // Allocates memory for 6
+        
         // EndGameFrame
         pnlEndGame = new JPanel();
         myModel = new MyTableModel();
         table = new JTable(myModel);
-        lblTitleResult = new JLabel("Resultaat");
+        btnNewGame = new JButton("Speel opnieuw");
+        lblTitleResult = new JLabel("Result"); // resultaat
         // JTextFields
-        tmpL = new JLabel[nrOfImputFields / 2];
+        
         model = new SourceListModel();
         category = new SourceListCategory("Woordenlijst");
         model.addCategory(category);
         model.addItemToCategory(new SourceListItem("Frans 1"), category);
         sourceList = new SourceList(model);
-        btnSaveList = new JButton("Opslaan");
-        // Create input fields
-        lblWord = new JLabel("Woord");
-        lblSeparator0 = new JLabel(" ; ");
-        lblTranslation = new JLabel("Vertaling");
-        for (int i = 0; i < nrOfImputFields; i++) { // create inputfields
-            tmp[i] = new JTextField();
-        }
-        for (int i = 0; i < nrOfImputFields / 2; i++) { // create separators
-            tmpL[i] = new JLabel(" ; ");
-        }
+        
         // Bottom
         bottomBar = new BottomBar(BottomBarSize.LARGE);
     }
@@ -264,16 +259,24 @@ public class Gui extends JFrame {
         mbMenu.setForeground(Color.black);
         pnlMenu.add(mbMenu);
         mbMenu.add(mFile);
+        mFile.setMnemonic(KeyEvent.VK_F);
         mFile.add(miNew);
+        miNew.setAccelerator(KeyStroke.getKeyStroke('N', CTRL_DOWN_MASK));
         mFile.add(miOpen);
+        miOpen.setAccelerator(KeyStroke.getKeyStroke('O', CTRL_DOWN_MASK));
         mFile.add(miExit);
+        miExit.setAccelerator(KeyStroke.getKeyStroke('Q', CTRL_DOWN_MASK));
+        // mFile.addSeparator();
         mbMenu.add(mVertaling);
+        mVertaling.setMnemonic(KeyEvent.VK_T);
         mVertaling.add(miAtoB);
         mVertaling.add(miBtoA);
-        mbMenu.add(miCreateList);
+        mbMenu.add(mEdit);
+        mEdit.setMnemonic(KeyEvent.VK_E);
+        mEdit.add(miCreateList);
         mbMenu.add(mHelp);
-        // TODO: remove miTest for production
-        //mHelp.add(miTest);
+        mHelp.setMnemonic(KeyEvent.VK_H);
+        mHelp.add(miHelp);
         mHelp.add(miCheckUpdate);
         // Center Panel
         pnlCenter.setLayout(new GridLayout(2, 1)); // rows, columns
@@ -281,25 +284,19 @@ public class Gui extends JFrame {
         pnlCenter.add(pnlCenterS);
         pnlCenter.setBorder(new EmptyBorder(10, 10, 10, 10)); // t,l,b,r
         // Woord Panel
-        pnlWords.setLayout(new GridLayout(2,1));
+        pnlWords.setLayout(new GridLayout(2, 1));
         pnlWords.setBackground(Color.white);
-        // Settings Panel
-        pnlSettings.setBackground(Color.darkGray);
-        pnlSettings.add(chkRandomWords);
-        pnlSettings.add(chkChars);
         // Create panel to show Words
         pnlWoord.add(lblWoord);
         pnlVertaling.add(lblVertaling);
-        pnlWords.setLayout(new GridLayout(2,1)); // r, c
+        pnlWords.setLayout(new GridLayout(2, 1)); // r, c
         pnlWoord.setBackground(Color.white);
         pnlVertaling.setBackground(Color.white);
         pnlWords.add(pnlWoord);
         pnlWords.add(pnlVertaling);
-        lblWoord.setFont(new Font("sansserif", Font.BOLD, 15));
         lblWoord.setHorizontalTextPosition(JLabel.CENTER);
         lblWoord.setVerticalTextPosition(JLabel.BOTTOM);
-        lblWoord.setBorder(BorderFactory.createEmptyBorder(pnlWoord.getHeight()/2,0,0,0)); //top,left
-        lblVertaling.setFont(new Font("sansserif", Font.BOLD, 15));
+        lblWoord.setBorder(BorderFactory.createEmptyBorder(pnlWoord.getHeight() / 2, 0, 0, 0)); //top,left
         lblVertaling.setHorizontalTextPosition(JLabel.CENTER);
         // Create the inputfield and (if needed) special characters
         pnlCenterS.setLayout(new GridLayout(2, 1)); // rijen, kolommen
@@ -328,8 +325,8 @@ public class Gui extends JFrame {
 
         if (dontJumpLeft) {
             bottomBar.addComponentToLeft(btnSettings);
-            bottomBar.addComponentToLeft(lblMelding,0);
-        }else{
+            bottomBar.addComponentToLeft(lblMelding, 0);
+        } else {
             bottomBar.addComponentToLeft(lblMelding, 0);
         }
 
@@ -341,6 +338,7 @@ public class Gui extends JFrame {
     private void initialiseerActionlisteners() {
         // Nieuw Spel
         miNew.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
                 try {
                     nieuwSpel();
@@ -352,6 +350,7 @@ public class Gui extends JFrame {
         });
         // OpenFile
         miOpen.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
                 try {
                     openFile();
@@ -422,6 +421,13 @@ public class Gui extends JFrame {
                 }
             }
         });
+        // Show Help files
+        miHelp.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                setTaAbout();
+            }
+        });
         // Test button, for everything
         miTest.addActionListener(new ActionListener() {
 
@@ -463,7 +469,7 @@ public class Gui extends JFrame {
                     frame.getContentPane().add(bottomBar.getComponent(),
                             BorderLayout.SOUTH);
                     //getContentPane().add(pnlSouth, BorderLayout.SOUTH);
-                    frame.getContentPane().add(pnlSettings, BorderLayout.CENTER);
+                    frame.getContentPane().add(settingsPanel.getPnlSettings(), BorderLayout.CENTER);
                     frame.getContentPane().add(pnlMenu, BorderLayout.NORTH);
                     lblMelding.setText("");
                     btnSettings.setText("Ga Terug");
@@ -475,7 +481,7 @@ public class Gui extends JFrame {
             }
         });
         // Random Woordjes
-        chkRandomWords.addActionListener(new ActionListener() {
+        settingsPanel.getChkRandomWords().addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
                 if (woordjes.randomWoordjes) {
@@ -498,7 +504,7 @@ public class Gui extends JFrame {
             }
         });
         // Special Characters bar
-        chkChars.addActionListener(new ActionListener() {
+        settingsPanel.getChkChars().addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
                 if (showChars) {
@@ -573,7 +579,7 @@ public class Gui extends JFrame {
             }
         });
         // Save inputList
-        btnSaveList.addActionListener(new ActionListener() {
+        inputPanel.getBtnSaveList().addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
                 try {
@@ -590,6 +596,15 @@ public class Gui extends JFrame {
 
             public void actionPerformed(ActionEvent e) {
                 check();
+            }
+        });
+        // Set fontsize
+        settingsPanel.getCbFontsize().addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                fontSize = (Integer) settingsPanel.getCbFontsize().getSelectedItem();
+                setFont(fontSize);
+
             }
         });
     }
@@ -621,72 +636,14 @@ public class Gui extends JFrame {
         // TODO: Remove for production if it doesn't work
         /*frame.getContentPane().add(getSourceList().getComponent(),
         BorderLayout.LINE_START);*/
-        frame.getContentPane().add(getPnlInputFrame(), BorderLayout.CENTER);
+        frame.getContentPane().add(inputPanel.getPnlInputFrame(), BorderLayout.CENTER);
         frame.getContentPane().add(getPnlMenu(), BorderLayout.PAGE_START);
         // pnlInputFrame.setLayout(new GridLayout((nrOfImputFields/2)+2, 3, 10,
         // 0)); // rijen, kolommen, H-space,-V-space
-        getPnlInputFrame().setLayout(new GridBagLayout());
-        getPnlInputFrame().setBorder(new EmptyBorder(5, 5, 5, 5)); // T,L,B,R
-        GridBagConstraints c = new GridBagConstraints();
-        c.weighty = 1.0;
-        c.weightx = 1.0;
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.insets = new Insets(0, 0, 2, 0); // bottom margin for elements
-        c.fill = GridBagConstraints.CENTER; // center elements
-        c.gridx = 0;
-        c.gridy = 0;
-        getPnlInputFrame().add(getLblWord(), c);
-        c.gridx = 1;
-        c.gridy = 0;
-        getPnlInputFrame().add(getLblSeparator0(), c);
-        c.gridx = 2;
-        c.gridy = 0;
-        getPnlInputFrame().add(getLblTranslation(), c);
-        int j = 0; //
-        int k = 0; //
-        int l = 1; //
-        for (int i = 0; i < getNrOfImputFields(); i++) {
-            getTmp()[i].setPreferredSize(new Dimension(200, 30)); // inputfield size
-            if (k == 0) {
-                c.gridx = 0;
-                k++;
-            }
-            if (k == 2) {
-                c.gridx = 2;
-                k = 0;
-            }
-            c.gridy = l;
-            getPnlInputFrame().add(getTmp()[i], c); // add field
-            if (k == 0) {
-                l++;
-            }
-            if (i % 2 < 1) {
-                c.gridx = 1;
-                c.weighty = 0.5;
-                c.weightx = 0.5;
-                getPnlInputFrame().add(getTmpL()[j], c); // add separator
-                c.weighty = 1.0;
-                c.weightx = 1.0;
-                j++;
-                k++;
-            }
-        }
-        c.gridx = 2;
-        c.gridy = l + 1;
-        getTmp()[0].setBackground(Color.lightGray);
-        getTmp()[0].setBorder(null);
-        getTmp()[0].setToolTipText(woordjes.getUiTranslation(3));
-        getTmp()[1].setBackground(Color.lightGray);
-        getTmp()[1].setBorder(null);
-        getTmp()[1].setToolTipText(woordjes.getUiTranslation(3));
-
-        getPnlInputFrame().add(getBtnSaveList(), c);
-        getLblMelding().setText("");
+        lblMelding.setText("");
         getBtnSettings().setText(woordjes.getUiTranslation(1));
         frame.getContentPane().repaint();
         frame.validate();
-        //frame.pack();
-
         setPageIsInputFrame(true);
     }
 
@@ -694,7 +651,6 @@ public class Gui extends JFrame {
         String strAorB = "";
 
         frame.getContentPane().removeAll();
-        btnNewGame = new JButton(woordjes.getUiTranslation(2));
         // EndGame New Game button
         btnNewGame.addActionListener(new ActionListener() {
 
@@ -774,9 +730,9 @@ public class Gui extends JFrame {
     private void saveInputList() throws FileNotFoundException, IOException {
         String words = "";
 
-        for (int i = 0; i < nrOfImputFields; i = i + 2) {
-            if (!tmp[i].getText().isEmpty()) {
-                words = words + tmp[i].getText() + ";" + tmp[i + 1].getText()
+        for (int i = 0; i < inputPanel.getNrOfImputFields(); i = i + 2) {
+            if (!inputPanel.getTmp()[i].getText().isEmpty()) {
+                words = words + inputPanel.getTmp()[i].getText() + ";" + inputPanel.getTmp()[i + 1].getText()
                         + "\n";
             }
         }
@@ -827,6 +783,26 @@ public class Gui extends JFrame {
         btnCheck.setEnabled(true);
         btnTip.setEnabled(true);
         endOfList = false;
+    }
+
+    private void setTaAbout() {
+        JScrollPane scrollPane = new JScrollPane(taAbout);
+        IAppWidgetFactory.makeIAppScrollPane(scrollPane);
+
+        taAbout.setBorder(new EmptyBorder(10, 10, 10, 10));
+        taAbout.setText("\nWoordjes\n\nPress alt \nto use menu \nshortcuts");
+        taAbout.setForeground(Color.white);
+        taAbout.setEnabled(false);  // Prevent users to edit help content
+        HudWindow hud = new HudWindow("Help");
+
+        hud.setContentPane(scrollPane);
+        scrollPane.setBackground(Color.darkGray);
+        taAbout.setBackground(Color.darkGray);
+
+        hud.getJDialog().setLocationRelativeTo(null);
+        hud.getJDialog().setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        hud.getJDialog().setVisible(true);
+        hud.getJDialog().setSize(200, 150); // width,length
     }
 
     public void openFile() throws FileNotFoundException, IOException {
@@ -905,48 +881,16 @@ public class Gui extends JFrame {
         return sourceList;
     }
 
-    public JLabel getLblWord() {
-        return lblWord;
-    }
-
-    public JLabel getLblSeparator0() {
-        return lblSeparator0;
-    }
-
-    public JLabel getLblTranslation() {
-        return lblTranslation;
-    }
-
     public JLabel getLblMelding() {
         return lblMelding;
-    }
-
-    public JButton getBtnSaveList() {
-        return btnSaveList;
     }
 
     public JButton getBtnSettings() {
         return btnSettings;
     }
 
-    public int getNrOfImputFields() {
-        return nrOfImputFields;
-    }
-
-    public JTextField[] getTmp() {
-        return tmp;
-    }
-
-    public JLabel[] getTmpL() {
-        return tmpL;
-    }
-
     public JPanel getPnlCenter() {
         return pnlCenter;
-    }
-
-    public JPanel getPnlInputFrame() {
-        return pnlInputFrame;
     }
 
     public Boolean getPageIsSettings() {
@@ -969,16 +913,52 @@ public class Gui extends JFrame {
     public void setPageIsInputFrame(Boolean b) {
         pageIsInputFrame = b;
     }
-}
 
-/*
- * private void setTaAbout() { taAbout.setFont(new Font("sansserif", Font.BOLD,
- * 12)); taAbout.setBorder(new EmptyBorder(10, 10, 10, 10));
- * taAbout.setText("\nWoordjes\n\nVersion: " + version +
- * "\nAuthor: Jan-Bart.be\n" + "Date: " + date); taAbout.setOpaque(false);
- * taAbout.setForeground(Color.white); taAbout.setEnabled(false);
- * hud.setContentPane(taAbout); hud.getJDialog().setSize(200, 150); // width,
- * length hud.getJDialog().setLocationRelativeTo(null);
- * hud.getJDialog().setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
- * hud.getJDialog().setVisible(true); }
- */
+    public void setFont(int fontsize) {
+        fontName = "sansserif";
+        fontStyle = Font.PLAIN;
+        fontSize = fontsize;
+        Font f = new Font(fontName, fontStyle, fontSize);
+        // Menu
+        mFile.setFont(f);
+        miNew.setFont(f);
+        mVertaling.setFont(f);
+        miOpen.setFont(f);
+        miHighscores.setFont(f);
+        miExit.setFont(f);
+        miAtoB.setFont(f);
+        miBtoA.setFont(f);
+        mEdit.setFont(f);
+        miCreateList.setFont(f);
+        miTest.setFont(f);
+        mHelp.setFont(f);
+        miHelp.setFont(f);
+        miCheckUpdate.setFont(f);
+        // Help
+        taAbout.setFont(f);
+        tfInput.setFont(f);
+        btnSettings.setFont(f);
+        lblWoord.setFont(new Font("sansserif", Font.BOLD, fontSize));
+        lblVertaling.setFont(new Font("sansserif", Font.BOLD, fontSize));
+        // End game
+        lblTitleResult.setFont(f);
+        table.setFont(f);
+        btnNewGame.setFont(f);
+        // BottomBar
+        lblMelding.setFont(f);
+        // Edit Panel
+        inputPanel.getLblWord().setFont(f);
+        inputPanel.getLblSeparator0().setFont(f);
+        inputPanel.getLblTranslation().setFont(f);
+        inputPanel.getBtnSaveList().setFont(f);
+        // Special Characters
+        btnAaigu.setFont(f);
+        btnAgrave.setFont(f);
+        btnAcirconflexe.setFont(f);
+        btnEaigu.setFont(f);
+        btnEgrave.setFont(f);
+        btnEcirconflexe.setFont(f);
+        btnIcirconflexe.setFont(f);
+        btnCcedille.setFont(f);
+    }
+}
