@@ -36,9 +36,9 @@ public class SettingsPanel extends JFrame {
     private void initializeComponents() {
         pnlSettings = new JPanel();
         layout = new SpringLayout();
-        chkRandomWords = HudWidgetFactory.createHudCheckBox(java.util.ResourceBundle.getBundle("woordjes/NL").getString("SHOW WORDS IN RANDOM ORDER"));
-        chkChars = HudWidgetFactory.createHudCheckBox(java.util.ResourceBundle.getBundle("woordjes/NL").getString("SHOW SPECIAL CHARACTERS"));
-        lblFontsize = HudWidgetFactory.createHudLabel(java.util.ResourceBundle.getBundle("woordjes/NL").getString("FONT SIZE"));
+        chkRandomWords = HudWidgetFactory.createHudCheckBox(java.util.ResourceBundle.getBundle("translations/Bundle").getString("SHOW WORDS IN RANDOM ORDER"));
+        chkChars = HudWidgetFactory.createHudCheckBox(java.util.ResourceBundle.getBundle("translations/Bundle").getString("SHOW SPECIAL CHARACTERS"));
+        lblFontsize = HudWidgetFactory.createHudLabel(java.util.ResourceBundle.getBundle("translations/Bundle").getString("FONT SIZE"));
         cbFontsize = HudWidgetFactory.createHudComboBox(new DefaultComboBoxModel(new Integer[]{10,12,14,16,18,20}));
 
     }

@@ -3,12 +3,10 @@ package woordjes;
 import com.explodingpixels.macwidgets.IAppWidgetFactory;
 import com.explodingpixels.macwidgets.HudWindow;
 import javax.swing.JTextArea;
-import java.awt.AlphaComposite;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -47,7 +45,6 @@ import com.explodingpixels.macwidgets.SourceListItem;
 import com.explodingpixels.macwidgets.SourceListModel;
 import java.awt.AWTException;
 import java.awt.Robot;
-import java.awt.SplashScreen;
 import java.awt.event.KeyEvent;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -79,6 +76,7 @@ public class Gui extends JFrame {
     private JButton btnCheck, btnTip, btnSettings, btnNewGame;
     private JLabel lblMelding;
     // InputFrame (create new lists with words)
+    private JButton btnSaveList, btnAddField;
     private SourceListModel model;
     private SourceListCategory category;
     private SourceList sourceList;
@@ -108,59 +106,24 @@ public class Gui extends JFrame {
     private boolean endOfList = false;
     private boolean dontJumpLeft = true;
     private boolean pageIsSettings, pageIsInputFrame, pageIsEndGame, showChars;
-    
     Dimension withoutChar = new Dimension(560, 350); // width, length
     Dimension withChar = new Dimension(550, 460);
 
-    static void renderSplashFrame(Graphics2D g, int frame) {
-        final String[] comps = {"Woorden", "Instellingen", "Layout"};
-        //final String[] comps = {java.util.ResourceBundle.getBundle("woordjes/NL").getString("WORDS"), java.util.ResourceBundle.getBundle("woordjes/NL").getString("SETTINGS"), java.util.ResourceBundle.getBundle("woordjes/NL").getString("LAYOUT")};
-        g.setComposite(AlphaComposite.Clear);
-        g.fillRect(80, 140, 200, 40);//x,y,w,h
-        g.setPaintMode();
-        g.setColor(Color.BLACK);
-        //g.drawString(java.util.ResourceBundle.getBundle("woordjes/NL").getString("LOADING: ") + comps[(frame / 50) % 3] + "...", 80, 150);
-        g.drawString("Laden: " + comps[(frame / 50) % 3] + "...", 80, 150);
-    }
-
-    public Gui(String version, String date) throws UnsupportedEncodingException {     
-        // Splash
-        final SplashScreen splash = SplashScreen.getSplashScreen();
-        if (splash == null) {
-            System.out.println("SplashScreen.getSplashScreen() returned null");
-            return;
-        }
-        Graphics2D g = splash.createGraphics();
-        if (g == null) {
-            System.out.println("g is null");
-            return;
-        }
-        for (int i = 0; i < 100; i++) {
-            renderSplashFrame(g, i);
-            splash.update();
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-            }
-        }
-        splash.close();
-
+    public Gui(String version, String date) throws UnsupportedEncodingException {
         this.version = version;
         this.date = date;
+
         // Create classes
         woordjes = new Words();
         settingsPanel = new SettingsPanel();
         inputPanel = new InputPanel();
 
         // Create the frame.
-        frame = new JFrame("Woordjes");
+        frame = new JFrame(java.util.ResourceBundle.getBundle("translations/Bundle").getString("WOORDJES"));
         // Set the frame icon to an image loaded from a file.
         java.net.URL imgURL = Gui.class.getResource("icon.gif");
         frame.setIconImage(new ImageIcon(imgURL).getImage());
-        
-        woordjes.laadWoorden(woordjes.wordlist);
-        woordjes.randomize();
-        
+
         initialiseerComponenten();
         showStartscreen();
         initialiseerActionlisteners();
@@ -171,7 +134,7 @@ public class Gui extends JFrame {
         if (!woordjes.msg.isEmpty()) {
             JOptionPane.showMessageDialog(Gui.this, woordjes.toString());
         }
-        
+
         frame.setSize(withoutChar);
         // Center frame on screen
         Toolkit toolkit = Toolkit.getDefaultToolkit();
@@ -189,21 +152,21 @@ public class Gui extends JFrame {
         pnlMenu = new JPanel();
         mbMenu = new JMenuBar();
         //mFile = new JMenu("<html><u>F</u>ile");
-        mFile = new JMenu("File");
+        mFile = new JMenu(java.util.ResourceBundle.getBundle("translations/Bundle").getString("FILE"));
         chooser = new JFileChooser();
-        miNew = new JMenuItem("Start again");
-        miOpen = new JMenuItem("Open file");
-        miHighscores = new JMenuItem("Highscores");
-        miExit = new JMenuItem("Exit");
-        mVertaling = new JMenu("Translation");
-        miAtoB = new JMenuItem("A -> B");
-        miBtoA = new JMenuItem("B -> A");
-        mEdit = new JMenu("Edit");
-        miCreateList = new JMenuItem("Compose list");
-        mHelp = new JMenu("Help");
-        miHelp = new JMenuItem("Help contents");
-        miTest = new JMenuItem("Test");
-        miCheckUpdate = new JMenuItem("Check for updates");
+        miNew = new JMenuItem(java.util.ResourceBundle.getBundle("translations/Bundle").getString("START AGAIN"));
+        miOpen = new JMenuItem(java.util.ResourceBundle.getBundle("translations/Bundle").getString("OPEN FILE"));
+        miHighscores = new JMenuItem(java.util.ResourceBundle.getBundle("translations/Bundle").getString("HIGHSCORES"));
+        miExit = new JMenuItem(java.util.ResourceBundle.getBundle("translations/Bundle").getString("EXIT"));
+        mVertaling = new JMenu(java.util.ResourceBundle.getBundle("translations/Bundle").getString("TRANSLATION"));
+        miAtoB = new JMenuItem(java.util.ResourceBundle.getBundle("translations/Bundle").getString("A -> B"));
+        miBtoA = new JMenuItem(java.util.ResourceBundle.getBundle("translations/Bundle").getString("B -> A"));
+        mEdit = new JMenu(java.util.ResourceBundle.getBundle("translations/Bundle").getString("EDIT"));
+        miCreateList = new JMenuItem(java.util.ResourceBundle.getBundle("translations/Bundle").getString("COMPOSE LIST"));
+        mHelp = new JMenu(java.util.ResourceBundle.getBundle("translations/Bundle").getString("HELP"));
+        miHelp = new JMenuItem(java.util.ResourceBundle.getBundle("translations/Bundle").getString("HELP CONTENTS"));
+        miTest = new JMenuItem(java.util.ResourceBundle.getBundle("translations/Bundle").getString("TEST"));
+        miCheckUpdate = new JMenuItem(java.util.ResourceBundle.getBundle("translations/Bundle").getString("CHECK FOR UPDATES"));
         //
         taAbout = new JTextArea();
         // Center
@@ -215,10 +178,10 @@ public class Gui extends JFrame {
         lblWoord = new JLabel();
         lblVertaling = new JLabel();
         tfInput = new JTextField();
-        btnCheck = new JButton("Check");
-        btnTip = new JButton("Tip");
-        btnSettings = new JButton("Settings");
-        lblMelding = new JLabel(woordjes.getUiTranslation(4));
+        btnCheck = new JButton(java.util.ResourceBundle.getBundle("translations/Bundle").getString("CHECK"));
+        btnTip = new JButton(java.util.ResourceBundle.getBundle("translations/Bundle").getString("TIP"));
+        btnSettings = new JButton(java.util.ResourceBundle.getBundle("translations/Bundle").getString("SETTINGS"));
+        lblMelding = new JLabel(java.util.ResourceBundle.getBundle("translations/Bundle").getString("TRANSLATE INTO ") + " ");
         // Settings - Special Characters
         pnlChars = new JPanel();
         btnAaigu = new JButton("\u00e0");
@@ -229,21 +192,20 @@ public class Gui extends JFrame {
         btnEcirconflexe = new JButton("\u00ea");
         btnIcirconflexe = new JButton("\u00ee");
         btnCcedille = new JButton("\u00e7");
-        
         // EndGameFrame
         pnlEndGame = new JPanel();
         myModel = new MyTableModel();
         table = new JTable(myModel);
-        btnNewGame = new JButton("Speel opnieuw");
-        lblTitleResult = new JLabel("Result"); // resultaat
-        // JTextFields
-        
+        btnNewGame = new JButton(java.util.ResourceBundle.getBundle("translations/Bundle").getString("START AGAIN"));
+        lblTitleResult = new JLabel(java.util.ResourceBundle.getBundle("translations/Bundle").getString("RESULT")); // resultaat
+        // InputPanel
+        btnSaveList = new JButton(java.util.ResourceBundle.getBundle("translations/Bundle").getString("SAVE"));
+        btnAddField = new JButton(java.util.ResourceBundle.getBundle("translations/Bundle").getString("ADD A FIELD"));
         model = new SourceListModel();
-        category = new SourceListCategory("Woordenlijst");
+        category = new SourceListCategory(java.util.ResourceBundle.getBundle("translations/Bundle").getString("WORDLIST"));
         model.addCategory(category);
         model.addItemToCategory(new SourceListItem("Frans 1"), category);
         sourceList = new SourceList(model);
-        
         // Bottom
         bottomBar = new BottomBar(BottomBarSize.LARGE);
     }
@@ -319,10 +281,15 @@ public class Gui extends JFrame {
             getContentPane().validate();
         }
         tfInput.setBorder(BorderFactory.createLoweredBevelBorder());
-        //UnifiedToolBar toolBar = new UnifiedToolBar();
         btnSettings.putClientProperty("JButton.buttonType", "textured");
-        // toolBar.addComponentToLeft(button);
-
+        btnSettings.setMnemonic(KeyEvent.VK_S);
+        frame.add(pnlMenu, BorderLayout.NORTH);
+        /*MacUtils.makeWindowLeopardStyle(frame.getRootPane());
+        UnifiedToolBar toolBar =  new UnifiedToolBar();
+        JButton button = new JButton("My Button");
+        button.putClientProperty("JButton.buttonType", "textured");
+        toolBar.addComponentToLeft(button);
+        frame.add(toolBar.getComponent(), BorderLayout.NORTH);*/
         if (dontJumpLeft) {
             bottomBar.addComponentToLeft(btnSettings);
             bottomBar.addComponentToLeft(lblMelding, 0);
@@ -343,7 +310,7 @@ public class Gui extends JFrame {
                 try {
                     nieuwSpel();
                 } catch (UnsupportedEncodingException e1) {
-                    JOptionPane.showMessageDialog(Gui.this, "UnsupportedEncodingException"
+                    JOptionPane.showMessageDialog(Gui.this, java.util.ResourceBundle.getBundle("translations/Bundle").getString("UNSUPPORTEDENCODINGEXCEPTION")
                             + e1);
                 }
             }
@@ -355,10 +322,10 @@ public class Gui extends JFrame {
                 try {
                     openFile();
                 } catch (FileNotFoundException e1) {
-                    JOptionPane.showMessageDialog(Gui.this, "File not found"
+                    JOptionPane.showMessageDialog(Gui.this, java.util.ResourceBundle.getBundle("translations/Bundle").getString("FILE NOT FOUND")
                             + e1);
                 } catch (IOException e1) {
-                    JOptionPane.showMessageDialog(Gui.this, "IOException" + e1);
+                    JOptionPane.showMessageDialog(Gui.this, java.util.ResourceBundle.getBundle("translations/Bundle").getString("IOEXCEPTION") + e1);
                 }
             }
         });
@@ -382,13 +349,13 @@ public class Gui extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 dontJumpLeft = false;
                 if (currentWord != 1) {
-                    JOptionPane.showMessageDialog(Gui.this, woordjes.getUiTranslation(0));
+                    JOptionPane.showMessageDialog(Gui.this, java.util.ResourceBundle.getBundle("translations/Bundle").getString("END THE CURRENT GAME FIRST OR START AGAIN."));
                 } else {
                     woordjes.AtoB = true;
                     try {
                         nieuwSpel();
                     } catch (UnsupportedEncodingException e1) {
-                        JOptionPane.showMessageDialog(Gui.this, "Unsupported Encoding Exception" + e1);
+                        JOptionPane.showMessageDialog(Gui.this, java.util.ResourceBundle.getBundle("translations/Bundle").getString("UNSUPPORTED ENCODING EXCEPTION") + e1);
                     }
                 }
             }
@@ -399,13 +366,13 @@ public class Gui extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 dontJumpLeft = false;
                 if (currentWord != 1) {
-                    JOptionPane.showMessageDialog(Gui.this, woordjes.getUiTranslation(0));
+                    JOptionPane.showMessageDialog(Gui.this, java.util.ResourceBundle.getBundle("translations/Bundle").getString("END THE CURRENT GAME FIRST OR START AGAIN."));
                 } else {
                     woordjes.AtoB = false;
                     try {
                         nieuwSpel();
                     } catch (UnsupportedEncodingException e1) {
-                        JOptionPane.showMessageDialog(Gui.this, "Unsupported Encoding Exception: " + e1);
+                        JOptionPane.showMessageDialog(Gui.this, java.util.ResourceBundle.getBundle("translations/Bundle").getString("UNSUPPORTED ENCODING EXCEPTION: ") + e1);
                     }
                 }
             }
@@ -432,7 +399,7 @@ public class Gui extends JFrame {
         miTest.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(Gui.this, "Random: " + woordjes.randomWoordjes);
+                JOptionPane.showMessageDialog(Gui.this, java.util.ResourceBundle.getBundle("translations/Bundle").getString("RANDOM: ") + woordjes.randomWoordjes);
             }
         });
 
@@ -440,18 +407,18 @@ public class Gui extends JFrame {
         miCheckUpdate.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(Gui.this, "OS: "
-                        + woordjes.getOs() + "\nDatum: " + date + "\nVersie: "
+                JOptionPane.showMessageDialog(Gui.this, java.util.ResourceBundle.getBundle("translations/Bundle").getString("OS: ")
+                        + woordjes.getOs() + "\n" + java.util.ResourceBundle.getBundle("translations/Bundle").getString("DATE: ") + date + "\n" + java.util.ResourceBundle.getBundle("translations/Bundle").getString("VERSION: ")
                         + version);
                 try {
                     java.awt.Desktop.getDesktop().browse(
                             new URI(
                             "http://jan-bart.be/public/woordjes/update/?v="
-                            + version));
+                            + version + ""));
                 } catch (IOException e1) {
-                    JOptionPane.showMessageDialog(Gui.this, "IOException: " + e1);
+                    JOptionPane.showMessageDialog(Gui.this, java.util.ResourceBundle.getBundle("translations/Bundle").getString("IOEXCEPTION: ") + e1);
                 } catch (URISyntaxException e1) {
-                    JOptionPane.showMessageDialog(Gui.this, "URISyntaxExceptio: " + e1);
+                    JOptionPane.showMessageDialog(Gui.this, "URISyntaxException: " + e1);
                 }
 
             }
@@ -472,7 +439,7 @@ public class Gui extends JFrame {
                     frame.getContentPane().add(settingsPanel.getPnlSettings(), BorderLayout.CENTER);
                     frame.getContentPane().add(pnlMenu, BorderLayout.NORTH);
                     lblMelding.setText("");
-                    btnSettings.setText("Ga Terug");
+                    btnSettings.setText(java.util.ResourceBundle.getBundle("translations/Bundle").getString("GO BACK"));
                     // setSize(withoutChar);
                     frame.getContentPane().repaint();
                     // validate();
@@ -491,7 +458,7 @@ public class Gui extends JFrame {
                     try {
                         nieuwSpel();
                     } catch (UnsupportedEncodingException e1) {
-                        JOptionPane.showMessageDialog(Gui.this, "UnsupportedEncodingException" + e1);
+                        JOptionPane.showMessageDialog(Gui.this, java.util.ResourceBundle.getBundle("translations/Bundle").getString("UNSUPPORTEDENCODINGEXCEPTION") + e1);
                     }
                 }
             }
@@ -579,15 +546,15 @@ public class Gui extends JFrame {
             }
         });
         // Save inputList
-        inputPanel.getBtnSaveList().addActionListener(new ActionListener() {
+        btnSaveList.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
                 try {
                     saveInputList();
                 } catch (FileNotFoundException e1) {
-                    System.out.println("Error: " + e1);
+                    System.out.println(java.util.ResourceBundle.getBundle("translations/Bundle").getString("ERROR: ") + e1);
                 } catch (IOException e1) {
-                    System.out.println("Error: " + e1);
+                    System.out.println(java.util.ResourceBundle.getBundle("translations/Bundle").getString("ERROR: ") + e1);
                 }
             }
         });
@@ -596,6 +563,13 @@ public class Gui extends JFrame {
 
             public void actionPerformed(ActionEvent e) {
                 check();
+            }
+        });
+        // Add a new translation field
+        btnAddField.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                addNewInputField();
             }
         });
         // Set fontsize
@@ -612,7 +586,7 @@ public class Gui extends JFrame {
     private void showStartscreen() {
         frame.getContentPane().removeAll();
         layoutComponenten();
-        btnSettings.setText("Settings");
+        btnSettings.setText(java.util.ResourceBundle.getBundle("translations/Bundle").getString("SETTINGS"));
         frame.getContentPane().repaint();
         frame.validate();
         pageIsSettings = false;
@@ -620,10 +594,10 @@ public class Gui extends JFrame {
         pageIsEndGame = false;
         dontJumpLeft = false;
         if (!woordjes.AtoB) {
-            lblMelding.setText(woordjes.getUiTranslation(4) + woordjes.lang1 + "\t - \t Woord: " + currentWord + " / "
+            lblMelding.setText(java.util.ResourceBundle.getBundle("translations/Bundle").getString("TRANSLATE INTO ") + " " + woordjes.lang1 + "\t - \t "+java.util.ResourceBundle.getBundle("translations/Bundle").getString("WORD: ")+ " " + currentWord + " / "
                     + woordjes.woorden.size());
         } else {
-            lblMelding.setText(woordjes.getUiTranslation(4) + woordjes.lang2 + "\t - \t Woord: " + currentWord + " / "
+            lblMelding.setText(java.util.ResourceBundle.getBundle("translations/Bundle").getString("TRANSLATE INTO ") + " " + woordjes.lang2 + "\t - \t "+java.util.ResourceBundle.getBundle("translations/Bundle").getString("WORD: ")+" " + currentWord + " / "
                     + woordjes.woorden.size());
         }
     }
@@ -631,20 +605,73 @@ public class Gui extends JFrame {
     private void createInputFrame() {
         frame.getContentPane().removeAll();
         getSourceList().getComponent().setPreferredSize(new Dimension(150, 220)); // w,h
-        frame.getContentPane().add(getBottomBar().getComponent(),
-                BorderLayout.PAGE_END);
+        frame.getContentPane().add(getBottomBar().getComponent(),BorderLayout.PAGE_END);
         // TODO: Remove for production if it doesn't work
         /*frame.getContentPane().add(getSourceList().getComponent(),
         BorderLayout.LINE_START);*/
-        frame.getContentPane().add(inputPanel.getPnlInputFrame(), BorderLayout.CENTER);
+
+        JScrollPane scrollPane = new JScrollPane(inputPanel.getPnlInputFrame());
+        IAppWidgetFactory.makeIAppScrollPane(scrollPane);
+        frame.getContentPane().add(scrollPane, BorderLayout.CENTER);
         frame.getContentPane().add(getPnlMenu(), BorderLayout.PAGE_START);
         // pnlInputFrame.setLayout(new GridLayout((nrOfImputFields/2)+2, 3, 10,
         // 0)); // rijen, kolommen, H-space,-V-space
         lblMelding.setText("");
-        getBtnSettings().setText(woordjes.getUiTranslation(1));
+        getBtnSettings().setText(java.util.ResourceBundle.getBundle("translations/Bundle").getString("GO BACK"));
+        inputPanel.getPnlInputFrame().add(btnSaveList, inputPanel.c);
+        inputPanel.c.gridx = 0;
+        inputPanel.getPnlInputFrame().add(btnAddField, inputPanel.c);
         frame.getContentPane().repaint();
         frame.validate();
-        setPageIsInputFrame(true);
+
+        pageIsSettings = false;
+        pageIsEndGame = false;
+        pageIsInputFrame =true;
+
+    }
+
+    private void addNewInputField(){
+        inputPanel.addInputField();
+        inputPanel.getPnlInputFrame().add(btnSaveList, inputPanel.c);
+        inputPanel.c.gridx = 0;
+        inputPanel.getPnlInputFrame().add(btnAddField, inputPanel.c);
+        frame.getContentPane().repaint();
+        frame.validate();
+    }
+
+     private void saveInputList() throws FileNotFoundException, IOException {
+        String words = "";
+
+        for (int i = 0; i < inputPanel.getNrOfImputFields(); i = i + 2) {
+            if (!inputPanel.getTmp()[i].getText().isEmpty()) {
+                words = words + inputPanel.getTmp()[i].getText() + java.util.ResourceBundle.getBundle("translations/Bundle").getString(";") + inputPanel.getTmp()[i + 1].getText()
+                        + "\n";
+            }
+        }
+        JFileChooser jFileChooser = new JFileChooser();
+        jFileChooser.setSelectedFile(new File("Woordenlijst"));
+
+        int returnVal = jFileChooser.showSaveDialog(frame);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            File file = jFileChooser.getSelectedFile();
+            String fileName = file.getPath();
+
+            /*
+             * Writer output = new BufferedWriter( new FileWriter(fileName +
+             * ".wrd"));
+             */
+            OutputStream out = new FileOutputStream(fileName);
+            Closeable stream = out;
+
+            try {
+                Writer output = new OutputStreamWriter(out, "UTF-8");
+                stream = output;
+                // FileWriter always assumes default encoding is OK!
+                output.write(words);
+            } finally {
+                stream.close();
+            }
+        }
     }
 
     private void createEndGame() {
@@ -666,24 +693,24 @@ public class Gui extends JFrame {
         frame.getContentPane().add(getPnlMenu(), BorderLayout.PAGE_START);
 
         Object[][] rowData2 = {
-            {"Vertaling", strAorB},
-            {"Random", woordjes.randomWoordjes},
-            {"Woorden juist", res},
-            {"Woorden fout", fout},
-            {"Totaal: ", res + " / " + woordjes.woorden.size()}
+            {java.util.ResourceBundle.getBundle("translations/Bundle").getString("TRANSLATION"), strAorB},
+            {java.util.ResourceBundle.getBundle("translations/Bundle").getString("RANDOM"), woordjes.randomWoordjes},
+            {java.util.ResourceBundle.getBundle("translations/Bundle").getString("CORRECT WORDS"), res},
+            {java.util.ResourceBundle.getBundle("translations/Bundle").getString("INCORRECT WORDS"), fout},
+            {java.util.ResourceBundle.getBundle("translations/Bundle").getString("TOTAL: "), res + java.util.ResourceBundle.getBundle("translations/Bundle").getString(" / ") + woordjes.woorden.size()}
         };
 
         myModel.setRowData(rowData2);
         // AtoB or BtoA?
         if (woordjes.AtoB == true) {
-            strAorB = woordjes.lang1 + " -> " + woordjes.lang2;
+            strAorB = woordjes.lang1 + java.util.ResourceBundle.getBundle("translations/Bundle").getString(" -> ") + woordjes.lang2;
         } else {
-            strAorB = woordjes.lang2 + " -> " + woordjes.lang1;
+            strAorB = woordjes.lang2 + java.util.ResourceBundle.getBundle("translations/Bundle").getString(" -> ") + woordjes.lang1;
         }
         if (woordjes.randomWoordjes) {
-            table.setValueAt("Woordjes werden random weergegeven", 1, 1);
+            table.setValueAt(java.util.ResourceBundle.getBundle("translations/Bundle").getString("WORDS WERE IN RANDOM ORDER"), 1, 1);
         } else {
-            table.setValueAt("Woordjes werden niet random weergegeven", 1, 1);
+            table.setValueAt(java.util.ResourceBundle.getBundle("translations/Bundle").getString("WORDS WERE NOT IN RANDOM ORDER"), 1, 1);
         }
         table.setValueAt(strAorB, 0, 1);
 
@@ -722,44 +749,9 @@ public class Gui extends JFrame {
             robot.keyPress(KeyEvent.VK_RIGHT);
             robot.keyRelease(KeyEvent.VK_RIGHT);
         } catch (AWTException e) {
-            System.out.println("Error: " + e);
+            System.out.println(java.util.ResourceBundle.getBundle("translations/Bundle").getString("ERROR: ") + e);
         }
 
-    }
-
-    private void saveInputList() throws FileNotFoundException, IOException {
-        String words = "";
-
-        for (int i = 0; i < inputPanel.getNrOfImputFields(); i = i + 2) {
-            if (!inputPanel.getTmp()[i].getText().isEmpty()) {
-                words = words + inputPanel.getTmp()[i].getText() + ";" + inputPanel.getTmp()[i + 1].getText()
-                        + "\n";
-            }
-        }
-        JFileChooser jFileChooser = new JFileChooser();
-        jFileChooser.setSelectedFile(new File("Woordenlijst"));
-
-        int returnVal = jFileChooser.showSaveDialog(frame);
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
-            File file = jFileChooser.getSelectedFile();
-            String fileName = file.getPath();
-
-            /*
-             * Writer output = new BufferedWriter( new FileWriter(fileName +
-             * ".wrd"));
-             */
-            OutputStream out = new FileOutputStream(fileName);
-            Closeable stream = out;
-
-            try {
-                Writer output = new OutputStreamWriter(out, "UTF-8");
-                stream = output;
-                // FileWriter always assumes default encoding is OK!
-                output.write(words);
-            } finally {
-                stream.close();
-            }
-        }
     }
 
     private void nieuwSpel() throws UnsupportedEncodingException {
@@ -790,10 +782,10 @@ public class Gui extends JFrame {
         IAppWidgetFactory.makeIAppScrollPane(scrollPane);
 
         taAbout.setBorder(new EmptyBorder(10, 10, 10, 10));
-        taAbout.setText("\nWoordjes\n\nPress alt \nto use menu \nshortcuts");
+        taAbout.setText("\nWOORDJES\n\nPRESS ALT \nTO USE MENU \nSHORTCUTS");
         taAbout.setForeground(Color.white);
         taAbout.setEnabled(false);  // Prevent users to edit help content
-        HudWindow hud = new HudWindow("Help");
+        HudWindow hud = new HudWindow(java.util.ResourceBundle.getBundle("translations/Bundle").getString("HELP"));
 
         hud.setContentPane(scrollPane);
         scrollPane.setBackground(Color.darkGray);
@@ -834,8 +826,8 @@ public class Gui extends JFrame {
                 res++;
             }
             isFout = false;
-            lblMelding.setText(" HOERA! \t - \t Woord: " + currentWord + " / "
-                    + woordjes.woorden.size() + "\t - \t Score: " + res + " / "
+            lblMelding.setText(java.util.ResourceBundle.getBundle("translations/Bundle").getString(" HOORAY!") +" \t - \t "+java.util.ResourceBundle.getBundle("translations/Bundle").getString("WORD:") +" " + currentWord + " / "
+                    + woordjes.woorden.size() + "\t - \t "+java.util.ResourceBundle.getBundle("translations/Bundle").getString("SCORE: ") + res + " / "
                     + woordjes.woorden.size());
 
             // Set a new word if end of list isn't reached
@@ -853,8 +845,8 @@ public class Gui extends JFrame {
             isFout = true;
             lblVertaling.setForeground(Color.red);
             lblVertaling.setText("\n" + woordjes.getVertaling());
-            lblMelding.setText(" Oooh :( \t - \t Woord: " + currentWord + " / "
-                    + woordjes.woorden.size() + "\t - \t Score: " + res + " / "
+            lblMelding.setText(java.util.ResourceBundle.getBundle("translations/Bundle").getString(" OOOH :(") +" \t - \t "+java.util.ResourceBundle.getBundle("translations/Bundle").getString("WORD: ") + currentWord + " / "
+                    + woordjes.woorden.size() + "\t - \t "+java.util.ResourceBundle.getBundle("translations/Bundle").getString("SCORE: ") + res + " / "
                     + woordjes.woorden.size());
         }
         if (endOfList && !isFout) {
@@ -950,7 +942,7 @@ public class Gui extends JFrame {
         inputPanel.getLblWord().setFont(f);
         inputPanel.getLblSeparator0().setFont(f);
         inputPanel.getLblTranslation().setFont(f);
-        inputPanel.getBtnSaveList().setFont(f);
+        btnSaveList.setFont(f);
         // Special Characters
         btnAaigu.setFont(f);
         btnAgrave.setFont(f);
