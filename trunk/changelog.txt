@@ -1,3 +1,7 @@
+V0.7.0 2011-01-03
+- Change: English as default language
+- Add: Use as many inputfields as you like in inputPanel
+
 V0.6.9 2011-01-02
 - Add: Change fontsize in settings menu
 - Add: NL-translation with NetBeans build in internationalization

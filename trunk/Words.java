@@ -19,7 +19,6 @@ public class Words {
     public ArrayList<String> woorden = new ArrayList<String>();
     public ArrayList<String> vertaling = new ArrayList<String>();
     public ArrayList<Integer> gebruikt = new ArrayList<Integer>();
-    public ArrayList<String> uiTranslations = new ArrayList<String>();
     public String separator = ";";
     public int index;
     public boolean AtoB = true; // Translation a -> b or a <- b
@@ -39,66 +38,41 @@ public class Words {
          * WARNING: This are System specific settings
          */
         // Check for OS
-        if (os.equalsIgnoreCase("Mac OS X")) {
-            settingsPath = "/Library/Preferences/woordjes.settings.wrd";
-            wordlistPath = "/Library/Preferences/woordjes.list.wrd";
+       /* if (os.equalsIgnoreCase("Mac OS X")) {
+        settingsPath = "/Library/Preferences/woordjes.settings.wrd";
+        wordlistPath = "/Library/Preferences/woordjes.list.wrd";
         }
         // Check for Windows
         if (os.equalsIgnoreCase("Windows XP")) {
-            settingsPath = "/woordjes.settings.wrd";
-            wordlistPath = "/woordjes.list.wrd";
-        } else {
-            // TODO: implement other oses
-            settingsPath = "woordjes.settings.wrd";
-            // Linux can't write "/" if user isn't root.
-            wordlistPath = "woordjes.list.wrd";
-            // = most of the time. So don't use "/"
-        }
+        settingsPath = "/woordjes.settings.wrd";
+        wordlistPath = "/woordjes.list.wrd";
+        } else {*/
+        // TODO: implement other oses
+        settingsPath = "woordjes.settings.wrd";
+        // Linux can't write "/" if user isn't root.
+        wordlistPath = "woordjes.list.wrd";
+        // = most of the time. So don't use "/"
+        // }
 
         getSettings();
-        wordlist = new File(wordlistPath);
-        // Check if there's a wordlist available
-        if (wordlist.exists()) {
-        // We found a path to a file,
-        //but does it still exists or does it contain words?
-
-        try {
-        BufferedReader in = new BufferedReader(new InputStreamReader(
-        new FileInputStream(wordlist), "UTF-8"));
-        String s;
-        while ((s = in.readLine()) != null) {
-        s = s.trim();
-        }
-        in.close();
-        } catch (Exception e) {
-        createTmpWordList();
-        }
-        }else{
-        createTmpWordList();
-        }
-
-        setUiTranslations();
-    }
-
-    public String getOs() {
-        return os;
     }
 
     private void createTmpWordList() {
-        System.out.println("No Path found or No Content Found");
+        wordlist = new File(wordlistPath);
         try {
             wordlist.createNewFile();
         } catch (IOException e) {
-            msg = msg.concat("IO Exception: " + e + "\n");
+            msg = msg.concat(java.util.ResourceBundle.getBundle("translations/Bundle").getString("IO EXCEPTION: ") + e + "\n");
+
         }
         // Write to temp file
         BufferedWriter out;
         try {
             out = new BufferedWriter(new FileWriter(wordlist));
-            out.write("Nederlands ; Frans\nhond ; chien\nkat ; chat");
+            out.write("English ; Dutch\nDog ; Hond\nCat ; Kat");
             out.close();
         } catch (IOException e) {
-            msg = msg.concat("IO Exception: " + e + "\n");
+            msg = msg.concat(java.util.ResourceBundle.getBundle("translations/Bundle").getString("IO EXCEPTION: ") + e + "\n");
         }
     }
 
@@ -112,25 +86,10 @@ public class Words {
      * http://illegalargumentexception.blogspot.com/2009/05/java-rough-
      * guide-to-character-encoding.html
      */
-    private void setUiTranslations() {
-        uiTranslations.add("Maak eerst het huidige spel af of begin een nieuw spel");
-        uiTranslations.add("Ga terug");
-        uiTranslations.add("Speel opnieuw");
-        uiTranslations.add("Geef hier de naam van de taal in. Bv.: Frans");
-        uiTranslations.add("Vertaal in het "); // Overwritten in Gui constructor
-        uiTranslations.add("Score: " + 0 + " / " + woorden.size()); // 5
-
-    }
-
-    public String getUiTranslation(int index) {
-        return uiTranslations.get(index);
-    }
-
     public void laadWoorden(File wordlist) throws UnsupportedEncodingException {
 
         int regel = 0;
         try {
-            // BufferedReader in = new BufferedReader(new FileReader(wordlist));
             BufferedReader in = new BufferedReader(new InputStreamReader(
                     new FileInputStream(wordlist), "UTF-8"));
 
@@ -144,8 +103,8 @@ public class Words {
                 regel++;
                 // Check if every line has a translation
                 if (!s.contains(separator)) {
-                    msg = msg.concat("Geen vertaling gevonden of een verkeerd teken gebruikt op regel: "
-                            + regel + "\n");
+                    msg = msg.concat("No translation found or wrong character used on rule number: "
+                            + regel + "\n"); //Geen vertaling gevonden of een verkeerd teken gebruikt op regel:
                 }
                 // zorg ervoor dat accenten ook worden afgedrukt
                 // String u = new String(s.getBytes(), "UTF-8"); Only works if
@@ -170,7 +129,7 @@ public class Words {
             }
             in.close();
         } catch (IOException e) {
-           
+
             msg = msg.concat("IOException: " + e + "\n");
         } catch (Exception e) {
             msg = msg.concat("Exception: " + e + "\n");
@@ -185,6 +144,8 @@ public class Words {
                 gebruikt.add(i);
             }
         }
+
+        randomize();
     }
 
     public void setSettings(File aFile, String aContents)
@@ -233,17 +194,21 @@ public class Words {
         Settings = new File(settingsPath);
 
         if (!Settings.exists()) {
-            // Maak zelf een file
+            // Settings file not found. Create one.
             try {
-                setSettings(Settings, ""); // Create an empty settings page (to
-                // store settings later)
+                // Add the path for the new wordlist into the settingsfile
+                setSettings(Settings, wordlistPath);
             } catch (FileNotFoundException e) {
                 msg = msg.concat("File Not Found Exception: " + e + "\n");
             } catch (IOException e) {
                 msg = msg.concat("IO Exception: " + e + "\n");
             }
+            // Create a wordlist
+            createTmpWordList();
+            // Try again
+            getSettings();
         } else {
-            // read the existing settings file
+            // Settings file found. Try to read it.
             try {
                 BufferedReader in = new BufferedReader(new FileReader(Settings));
                 String str;
@@ -251,13 +216,17 @@ public class Words {
                     // zorg ervoor dat accenten ook worden afgedrukt
                     String UTF8str = new String(str.getBytes(), "UTF-8");
                     wordlist = new File(UTF8str);
-                    //boolean exists = wordlist.exists();
                     if (wordlist.exists()) {
                         // The path inside the settings does exists
+                        laadWoorden(wordlist);
                     } else {
                         // The path inside the settings file doesn't exists
-                        // So create a wordlist file
+                        // so we create a new settings file
+                        setSettings(Settings, wordlistPath);
+                        // and create a wordlist file to
                         createTmpWordList();
+                        // And try again
+                        getSettings();
                     }
                 }
                 in.close();
@@ -296,6 +265,10 @@ public class Words {
             }
         }
         return index;
+    }
+
+    public String getOs() {
+        return os;
     }
 
     public int getIndex() {
